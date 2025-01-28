@@ -2,6 +2,7 @@ import { Box,Button,Container, Heading, Input,VStack } from '@chakra-ui/react';
 import React, { useState } from 'react'
 import { useColorModeValue } from '../components/ui/color-mode';
 import { useProductStore } from '../components/ui/store/product';
+import { Toaster, toaster } from "../components/ui/toaster"
 
 const CreatePage = () => {
   const [newProduct, setNewProduct] = useState({
@@ -10,14 +11,32 @@ const CreatePage = () => {
     image: ""
   });
 
+  // const toast = useToast()
+
   const {createProduct} = useProductStore()
 
   const handleAddProduct = async() => {
     const {success,message} = await createProduct(newProduct)
-    console.log("Success:", success)
-    console.log("Message:", message)
+    if(!success){
+      toaster.create({
+        title:"Error",
+        description: message,
+        type:"error",
+        // duration: 5000,
+        isClosable: true
+      })
+    } else{
+      toaster.create({
+        title:"Success",
+        description: message,
+        type:"success",
+        isClosable: true
+      })  
+    }
+    console.log(success,message)
   }
   return (
+    
     <Container maxW={"container.sm"}>
       <VStack
       spacing={8}
@@ -51,15 +70,15 @@ const CreatePage = () => {
               value={newProduct.image}
               onChange={(e) => setNewProduct({...newProduct,image: e.target.value})}
             />
-
+            <Toaster />
             <Button colorScheme={'blue'} onClick={handleAddProduct} w ='full'>
               Add Product
             </Button>
+          
           </VStack>
 
         </Box>
       </VStack>
-      CreatePage
     </Container>
   )
 }
